@@ -9,10 +9,11 @@ This tool can create backups of folders and mysql databases. It's simple yet sup
 
 ## Features:
 
+- Made to be easy to setup, and use for multiple servers.
 - Easy to understand and use.
 - Rotating backups, select how many backups you want stored for a specific item. Can also be disabled.
-- Made to be easy to setup, and use for multiple servers.
-
+- Log files for the backup, you actually know what was done.
+- TONS of configuration can be done.
 
 
 ## Installing
@@ -39,11 +40,49 @@ chmod +x install.sh linuxbackups
 
 ## Getting started
 
+
+### Configuration
+
+Understanding the powerful configuration management is really important.
+
 You can choose to run the backup script in different ways, you can configure the configuration inside the `config` folder
 or you can use the various available arguments. See `linuxbackups backups:filesystem --help` for help.
 
 
 
+### Database backup
+
+
+Default configuration:
+
+```json
+{
+    "backup_path": "/home/dropbox/Dropbox/Servers/%server_name/Databases",
+    "amount_of_backups": 8,
+    "database": {
+        "user": "backup",
+        "password": "backup",
+        "host": "localhost",
+        "ignore_databases": ["mysql", "information_schema", "performance_schema"]
+    }
+}
+```
+
+
+### Filesystem backup
+
+Default configuration:
+
+```json
+{
+    "backup_path": "/home/dropbox/Dropbox/Servers/%server_name/Sites",
+    "amount_of_backups": 8,
+    "directories": {
+        "somesite": ["/home/www-data/vhosts/no/somesite/images", "/and/another/dir/related/to/somesite"],
+        "someothersite": ["/home/...."]
+    }
+}
+```
 
 
 ## Automated backups
@@ -57,3 +96,12 @@ backups of the hourly onces.
 00 00 * * * /home/dropbox/backup/linuxbackups backups:mysql --backup-file-prefix="daily"
 0 * * * *   /home/dropbox/backup/linuxbackups backups:mysql --backup-file-prefix="hourly" --setting.amount_of_backups=8
 ```
+
+
+## Dropbox
+
+TODO, ADD INSTRUCTIONS.
+
+## Notifications
+
+THIS IS NOT IMPLEMENTED YET.
