@@ -100,7 +100,8 @@ backups of the hourly onces.
 
 ## Dropbox
 
-TODO, ADD INSTRUCTIONS.
+See [Tutorial on Automatic Backups to Dropbox On Linux Distributions](http://pkj.no/en/automatic-backups-to-dropbox-on-linux/)
+
 
 ## Notifications
 
