@@ -1,0 +1,5 @@
+/.idea
+/vendor
+/config/*-*.json
+/composer.lock
+/composer.phar

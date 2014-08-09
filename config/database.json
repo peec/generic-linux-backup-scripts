@@ -1,0 +1,10 @@
+{
+    "backup_path": "/home/dropbox/Dropbox/Servers/%server_name/Databases",
+    "amount_of_backups": 2,
+    "database": {
+        "user": "backup",
+        "password": "backup",
+        "host": "localhost",
+        "ignore_databases": ["mysql", "information_schema", "performance_schema"]
+    }
+}

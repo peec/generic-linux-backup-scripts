@@ -1,0 +1,22 @@
+{
+    "name": "pkj/generic-linux-backup-scripts",
+    "type": "project",
+    "description": "This tool can create backups of folders and mysql databases. It's simple yet super powerful.",
+    "homepage": "http://github.com/peec/generic-linux-backup-scripts",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Petter Kjelkenes",
+            "email": "kjelkenes@gmail.com",
+            "homepage": "http://pkj.no",
+            "role": "Developer"
+        }
+    ],
+    "autoload": {
+        "psr-0": {"Pkj\\LinuxGenericBackup": "src/"}
+    },
+    "require": {
+        "php": ">=5.4.0",
+        "symfony/console": "2.5.*"
+    }
+}
