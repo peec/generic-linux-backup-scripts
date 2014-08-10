@@ -3,6 +3,7 @@ namespace Pkj\LinuxGenericBackup\Commands;
 
 
 use Pkj\LinuxGenericBackup\BackupHandler;
+use Pkj\LinuxGenericBackup\ServiceContainer;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -16,7 +17,8 @@ use Symfony\Component\Console\Formatter\OutputFormatterStyle;
  * Time: 23:32
  */
 
-class Filesystem extends Command{
+class Filesystem extends BaseCommand{
+
 
     protected function configure() {
         $this->setName("backups:filesystem")
@@ -37,14 +39,21 @@ EOT
     }
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $generic = BackupHandler::genericCommandArgumentsParse($input);
-        $handler = new BackupHandler($output, $generic, "filesystem.json");
-        $handler->allowCmdOverride($input);
-        $handler->configSpecification->requireConfig('directories:array');
 
-        $handler->addTask(array($this, 'createBackups'));
-        $handler->run();
-    }
+            try {
+                $handler = $this->container->get('backup.handler');
+                $generic = BackupHandler::genericCommandArgumentsParse($input);
+                $handler->injectInterfaces($output, $generic, "filesystem.json");
+                $handler->allowCmdOverride($input);
+                $handler->configSpecification->requireConfig('directories:array');
+
+                $handler->addTask(array($this, 'createBackups'));
+                $handler->run();
+            } catch(\Exception $e) {
+                $this->container->get('notification.manager')->error("Error creating backups: " . $e->getMessage());
+                throw $e;
+            }
+        }
 
     public function createBackups (BackupHandler $handler) {
         $createdBackupArchives = array();

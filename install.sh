@@ -1,7 +1,13 @@
 #!/bin/bash
+
+if [ ! -f config/config.yml ]; then
+    cp config/config.yml.dist config/config.yml
+fi
+
 if [ ! -f composer.phar ]; then
     curl -sS https://getcomposer.org/installer | php
 fi
+
 
 if [ ! -d vendor ]; then
     php composer.phar install

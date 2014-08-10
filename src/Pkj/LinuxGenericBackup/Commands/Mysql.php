@@ -19,11 +19,8 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Formatter\OutputFormatterStyle;
 
-class Mysql extends Command{
+class Mysql extends BaseCommand{
 
-    public function __construct ($name) {
-        parent::__construct($name);
-    }
 
 
     protected function configure() {
@@ -46,12 +43,19 @@ EOT
     }
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $generic = BackupHandler::genericCommandArgumentsParse($input);
-        $handler = new BackupHandler($output, $generic, "database.json");
-        $handler->allowCmdOverride($input);
-        new GenericDatabaseInstructions($handler);
-        $handler->addTask(array($this, 'createBackups'));
-        $handler->run();
+
+        try {
+            $handler = $this->container->get('backup.handler');
+            $generic = BackupHandler::genericCommandArgumentsParse($input);
+            $handler->injectInterfaces($output, $generic, "database.json");
+            $handler->allowCmdOverride($input);
+            new GenericDatabaseInstructions($handler);
+            $handler->addTask(array($this, 'createBackups'));
+            $handler->run();
+        } catch(\Exception $e) {
+            $this->container->get('notification.manager')->error("Error creating backups: " . $e->getMessage());
+            throw $e;
+        }
     }
 
     public function createBackups (BackupHandler $handler) {

@@ -1,0 +1,11 @@
+parameters:
+    notification.manager.services: []
+services:
+    notification.manager:
+        class:     Pkj\LinuxGenericBackup\Notifications\NotificationManager
+        arguments: ["%notification.manager.services%"]
+
+    backup.handler:
+        class:     Pkj\LinuxGenericBackup\BackupHandler
+        arguments: ["@service_container"]
+

@@ -9,6 +9,9 @@
 namespace Pkj\LinuxGenericBackup;
 
 
+use Pkj\LinuxGenericBackup\Notifications\NotificationManager;
+use Pkj\LinuxGenericBackup\Notifications\NotificationManagerExtension;
+use Pkj\LinuxGenericBackup\Notifications\Pushover\PushoverExtension;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -47,12 +50,18 @@ class BackupHandler {
 
     public $configCmdOverride = array();
 
+
+    public $container;
+
+    public function __construct($container) {
+        $this->container = $container;
+    }
     /**
      * Creates config specification and sets up the object.
      * @param OutputInterface $output
      * @param $configFile
      */
-    public function __construct (OutputInterface $output, array $backupHandlerArguments, $configFile) {
+    public function injectInterfaces (OutputInterface $output, array $backupHandlerArguments, $configFile) {
         $this->output = $output;
         $this->configFile = "{$backupHandlerArguments['config-path']}$configFile";
         $this->configSpecification = new JsonFileExpressionParser($this->configFile, array_merge($backupHandlerArguments, array(
@@ -68,6 +77,7 @@ class BackupHandler {
         if (!$this->config['server_name']) {
             $this->configSpecification->requireConfig('server_name:string');
         }
+
 
     }
 
@@ -88,6 +98,7 @@ class BackupHandler {
      * Runs the procedure.
      */
     public function run () {
+        $startTime = time();
         // Allow cmd overrides..
 
         $linearConfig = array();
@@ -138,6 +149,12 @@ class BackupHandler {
         } else {
             $this->out("<info>Backup procedure done.</info>");
         }
+
+        if ($this->config['notifications-when-done']) {
+            $doneTime = time()  - $startTime;
+            $this->container->get('notification.manager')->info("Backups created in {$doneTime}s. A total of ".count($createdFiles)." tar archives created. Last file was " . basename(end($createdFiles)));
+        }
+
 
     }
 
@@ -314,6 +331,8 @@ class BackupHandler {
                 'Dateformat of the backup files, see valid values on php.net/date. (must be values: ' . self::DATE_FORMAT_REGEX . ')', 'Y-m-d_His'),
             new InputOption('debug', null, InputOption::VALUE_NONE,
                 'Enables debug information.'),
+            new InputOption('notifications-when-done', null, InputOption::VALUE_NONE,
+                'Send notifications when backups is done (see config/config.yml).')
         );
         if ($configFile && $data = json_decode(file_get_contents($defaultConfigPath . '/' . $configFile), true)) {
             $linearConfig = array();
@@ -342,6 +361,7 @@ class BackupHandler {
         $ar['backup-file-prefix'] = $input->getOption('backup-file-prefix');
         $ar['backup-date-format'] = $input->getOption('backup-date-format');
         $ar['debug'] = $input->getOption('debug');
+        $ar['notifications-when-done'] = $input->getOption('notifications-when-done');
 
         if (!preg_match('/^' . self::DATE_FORMAT_REGEX . '+$/', $ar['backup-date-format'])) {
             throw new \Exception("backup-date-format format is invalid, must be one of: " . self::DATE_FORMAT_REGEX);

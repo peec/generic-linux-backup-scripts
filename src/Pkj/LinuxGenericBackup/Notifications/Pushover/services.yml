@@ -1,0 +1,4 @@
+services:
+    notification.pushover:
+        class:     Pkj\LinuxGenericBackup\Notifications\Pushover\PushoverNotification
+        arguments: ["%notification.pushover.config%"]

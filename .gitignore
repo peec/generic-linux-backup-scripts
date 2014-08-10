@@ -3,3 +3,4 @@
 /config/*-*.json
 /composer.lock
 /composer.phar
+/config/*.yml

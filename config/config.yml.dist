@@ -1,0 +1,8 @@
+
+# To enable pushover (notification to your phone, see https://pushover.net/ ).
+# and uncomment below.
+#pushover:
+#    token : ""
+#    user: ""
+
+

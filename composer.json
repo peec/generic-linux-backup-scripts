@@ -17,6 +17,9 @@
     },
     "require": {
         "php": ">=5.4.0",
-        "symfony/console": "2.5.*"
+        "symfony/console": "2.5.*",
+        "symfony/yaml": "2.5.*",
+        "symfony/dependency-injection": "2.5.*",
+        "symfony/config": "2.5.*"
     }
 }
