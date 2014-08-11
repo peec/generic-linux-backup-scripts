@@ -53,6 +53,8 @@ class BackupHandler {
 
     public $container;
 
+    public $longNotificationMessage = "";
+
     public function __construct($container) {
         $this->container = $container;
     }
@@ -152,7 +154,17 @@ class BackupHandler {
 
         if ($this->config['notifications-when-done']) {
             $doneTime = time()  - $startTime;
-            $this->container->get('notification.manager')->info("Backups created in {$doneTime}s. A total of ".count($createdFiles)." tar archives created. Last file was " . basename(end($createdFiles)));
+
+            $baseMessage = "Backups created in {$doneTime}s. A total of ".count($createdFiles)." tar archives created.";
+
+            $longMessage = $baseMessage . "\n=====\nTar Archives Created:\n======\n" . implode("\n", $createdFiles);
+            $longMessage .= "\n======\nINFO:\n======\n" . $this->longNotificationMessage;
+
+            $this->container->get('notification.manager')->info(
+                "{$baseMessage}.Last file was " . basename(end($createdFiles)),
+                "{$longMessage}"
+
+            );
         }
 
 
@@ -180,10 +192,11 @@ class BackupHandler {
      */
     public function out ($o) {
         $path = $this->backupFolder;
-        $msg = '['.date('Y-m-d H:i:s') . '] : ' . $o . "\n";
+        $msg = '['.date('Y-m-d H:i:s') . '] : ' . $o;
         if (!$this->config['test']) {
-            file_put_contents($path . '/backup.log', $msg, FILE_APPEND);
+            file_put_contents($path . '/backup.log', $msg . "\n", FILE_APPEND);
         }
+        $this->longNotificationMessage .= $msg . "\n";
         $this->output->writeln($msg);
     }
 
@@ -194,6 +207,7 @@ class BackupHandler {
      * @throws \Exception
      */
     public function doExec ($e, $stopOnError=true) {
+        $output = array();
         if ( !$this->config['test']) {
             exec($e, $output, $return);
         } else {
@@ -210,6 +224,8 @@ class BackupHandler {
             }
         }
         $this->out($e);
+
+        $this->longNotificationMessage .= implode("\n", $output);
     }
 
 
@@ -254,7 +270,9 @@ class BackupHandler {
                         $backup_count[$wp_name]--;
                         $this->doExec("rm -f $file");
                     } else {
-                        $this->debug("($wp_name) Keeping file $file");
+                        $msg = "($wp_name) Keeping file $file";
+                        $this->debug($msg);
+                        $this->longNotificationMessage .= "$msg\n";
                     }
                 } else {
                     $this->debug("Date from file $dateFromFile does not match {$config['backup-date-format']}.");

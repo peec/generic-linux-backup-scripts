@@ -14,7 +14,7 @@ This tool can create backups of folders and mysql databases. It's simple yet sup
 - Rotating backups, select how many backups you want stored for a specific item. Can also be disabled.
 - Log files for the backup, you actually know what was done.
 - Notifications with [pushover](http://pushover.net) when something goes wrong, and possible also to send per successful backup routine.
-
+- Detailed notifications sent via mail.
 
 
 ## Installing
@@ -106,7 +106,16 @@ See [Tutorial on Automatic Backups to Dropbox On Linux Distributions](http://pkj
 
 ## Notifications
 
+### Mail
+
+Mail notifications will be more detailed, see config/config.yml.dist. If you use gmail transport, please enable IMAP on your gmail account.
+
+### Pushover
+
+Summed up notifications can be sent with pushover.
+
 See config/config.yml.dist.
+
 
 
 

@@ -41,7 +41,8 @@ abstract class BaseCommand extends Command{
     private function loadNotifiers ($container) {
 
         $notifiers = array (
-            'notification.pushover' => 'Pkj\LinuxGenericBackup\Notifications\Pushover\PushoverExtension'
+            'notification.pushover' => 'Pkj\LinuxGenericBackup\Notifications\Pushover\PushoverExtension',
+            'notification.mailer' => 'Pkj\LinuxGenericBackup\Notifications\Mailer\MailerExtension'
         );
 
         foreach($notifiers as $service => $class) {

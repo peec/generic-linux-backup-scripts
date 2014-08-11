@@ -1,0 +1,4 @@
+services:
+    notification.mailer:
+        class:     Pkj\LinuxGenericBackup\Notifications\Mailer\MailerNotification
+        arguments: ["%notification.mailer.config%"]

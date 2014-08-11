@@ -1,4 +1,15 @@
 
+# EMAIL NOTIFICATIONS:
+# To enable email notifications, uncomment below:
+#mailer:
+#    send_to: myemail@gmail.com
+#    transport: gmail
+#    gmail:
+#        username: myemail@gmail.com
+#        password: my gmail password
+
+
+# PUSHOVER NOTIFICATIONS:
 # To enable pushover (notification to your phone, see https://pushover.net/ ).
 # and uncomment below.
 #pushover:

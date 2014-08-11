@@ -22,14 +22,24 @@ class NotificationManager implements  NotificationInteface{
         $this->notifiers[] = $notifier;
     }
 
-    public function error($msg) {
+    public function error($msg, $detailedMessage = null) {
+        if ($detailedMessage == null)$detailedMessage = $msg;
         foreach($this->notifiers as $notifier) {
-            $notifier->error($msg);
+            if ($notifier instanceof LongNotificationInterface) {
+                $notifier->error($detailedMessage);
+            } else {
+                $notifier->error($msg);
+            }
         }
     }
-    public function info($msg) {
+    public function info($msg, $detailedMessage = null) {
+        if ($detailedMessage == null)$detailedMessage = $msg;
         foreach($this->notifiers as $notifier) {
-            $notifier->info($msg);
+            if ($notifier instanceof LongNotificationInterface) {
+                $notifier->info($detailedMessage);
+            } else {
+                $notifier->info($msg);
+            }
         }
     }
 
