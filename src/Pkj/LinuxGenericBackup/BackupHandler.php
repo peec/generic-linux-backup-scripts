@@ -206,24 +206,27 @@ class BackupHandler {
      * @param bool $stopOnError
      * @throws \Exception
      */
-    public function doExec ($e, $stopOnError=true) {
+    public function doExec ($e, $stopOnError=true, $formatter=null) {
         $output = array();
         if ( !$this->config['test']) {
             exec($e, $output, $return);
         } else {
             $return = 0;
         }
-
+        $message = $e;
+        if ($formatter) {
+            $message = call_user_func_array($formatter, array($e));
+        }
 
         if ($return) {
-            $msg = "Error (#$return): $e\nOutput:\n" . implode("\n", $output);
+            $msg = "Error (#$return): $message\nOutput:\n" . implode("\n", $output);
             if ($stopOnError) {
                 throw new \Exception($msg);
             } else {
                 $this->out($msg);
             }
         }
-        $this->out($e);
+        $this->out($message);
 
         $this->longNotificationMessage .= implode("\n", $output);
     }
