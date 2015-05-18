@@ -202,7 +202,7 @@ class BackupHandler {
 
     /**
      * Executes something on server.
-     * @param $e The command to execute, normally something to add a tar.gz. file.
+     * @param $e The command to execute, normally something to add a .gz. file.
      * @param bool $stopOnError
      * @throws \Exception
      */
@@ -246,17 +246,17 @@ class BackupHandler {
         }
 
         $prefix = $this->getBackupFilePrefix();
-        $files = glob("$path/*-$prefix{$config['server_name']}-*.tar.gz");
+        $files = glob("$path/*-$prefix{$config['server_name']}-*.gz");
         usort($files, array($this, 'sortByCreationDateDesc'));
 
         $backup_count = [];
         foreach($files as $file) {
 
             // Validation pattern, extremely important to not delete other files by mistake...
-            // Generates forexample: /^.*?[\-]{1}hourly-prod-(.*?).tar.gz/ when ./linuxbackups backups:filesystem --backup-file-prefix="hourly"
-            // Generates forexample: /^.*?[\-]{1}prod-(.*?).tar.gz/ when ./linuxbackups backups:filesystem
+            // Generates forexample: /^.*?[\-]{1}hourly-prod-(.*?).gz/ when ./linuxbackups backups:filesystem --backup-file-prefix="hourly"
+            // Generates forexample: /^.*?[\-]{1}prod-(.*?).gz/ when ./linuxbackups backups:filesystem
             $dirregex = str_replace('/', '\/', dirname($file));
-            $pattern = "/^$dirregex\/(.*?)[\-]{1}$prefix{$config['server_name']}-(.*?).tar.gz/";
+            $pattern = "/^$dirregex\/(.*?)[\-]{1}$prefix{$config['server_name']}-(.*?).gz/";
 
             if (preg_match($pattern, $file, $matches)) {
                 $dateFromFile = $matches[1];
@@ -312,7 +312,7 @@ class BackupHandler {
         $time = time();
         $date = date($config['backup-date-format'], $time);
         $prefix = $this->getBackupFilePrefix();
-        $file = "{$path}/$date-$prefix{$config['server_name']}-$name.tar.gz";
+        $file = "{$path}/$date-$prefix{$config['server_name']}-$name.gz";
         return $file;
     }
 

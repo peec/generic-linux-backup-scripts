@@ -75,7 +75,7 @@ EOT
         // Run.
         foreach($databases as $db) {
             $bpath = $handler->getBackupFilePath($db);
-            $cmd = "mysqldump --force --opt --user={$config['user']} --password={$config['password']} --databases $db  | gzip >  $bpath";
+            $cmd = "mysqldump --force --opt --user={$config['user']} --password={$config['password']} --databases $db  | gzip -c >  $bpath";
             $handler->doExec($cmd, false, function ($msg) {
                 return preg_replace("/password=(.*?)--databases/i", 'password="***" --databases', $msg);
             });

@@ -70,6 +70,15 @@ Default configuration:
 ```
 
 
+#### Restoring databasebackups:
+
+```
+cd /path/to/my/backups
+gunzip the-file-you-want-to-restore.gz
+mysql -u root -p DatabaseName < the-file-you-want-to-restore
+```
+
+
 ### Filesystem backup
 
 Default configuration:
