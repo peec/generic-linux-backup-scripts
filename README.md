@@ -115,6 +115,11 @@ See [Tutorial on Automatic Backups to Dropbox On Linux Distributions](http://pkj
 
 ## Notifications
 
+
+```
+Use --notifications-when-done if you want to send info notifiers aswell.
+``` 
+
 ### Mail
 
 Mail notifications will be more detailed, see config/config.yml.dist. If you use gmail transport, please enable IMAP on your gmail account.
