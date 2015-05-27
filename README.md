@@ -23,7 +23,7 @@ This tool can create backups of folders and mysql databases. It's simple yet sup
 - php 5.4 or more.
 - mysql: **if you  are going to use the mysql backup feature.**
 
-### Debian based / Ubuntu, requirements 
+##### Debian based / Ubuntu, requirements 
 
 ```
 sudo apt-get install php5 git
@@ -51,14 +51,6 @@ chmod +x install.sh linuxbackups
 
 
 ## Getting started
-
-
-### Configuration
-
-Understanding the powerful configuration management is really important.
-
-You can choose to run the backup script in different ways, you can configure the configuration inside the `config` folder
-or you can use the various available arguments. See `linuxbackups backups:filesystem --help` for help.
 
 
 
