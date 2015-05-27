@@ -50,11 +50,11 @@ chmod +x install.sh linuxbackups
 - The install script will ask you if you want to create a database backup user. It generates a backup user with a random password. Take care of this password as you will need it to configure the database backup user.
 
 
-## Getting started
+# Getting started
 
 
 
-### Creating database backups
+## Creating database backups
 
 **Our goal: You want to create daily backups of all your databases, keep 8 backups for the past 8 days.**
 
@@ -63,7 +63,7 @@ chmod +x install.sh linuxbackups
     ```
     sudo mkdir /opt/backups
     ```
-1. Configure database connection details, put this in `~/backup-tool/config/database.json`
+1. Configure database connection details, put this in `/opt/backup-tool/config/database.json`
 
     ```
     {
@@ -125,7 +125,7 @@ chmod +x install.sh linuxbackups
 
 
 
-#### Restoring databasebackups:
+##### Restoring databasebackups:
 
 ```
 cd /path/to/my/backups
@@ -134,7 +134,7 @@ mysql -u root -p DataBaseThatShouldGetTheImportedSQL < the-file-you-want-to-rest
 ```
 
 
-### Filesystem backup
+## Filesystem backup
 
 Default configuration:
 
@@ -155,6 +155,11 @@ Default configuration:
 This script runs daily backups of **filesystem** and **databases**, it also runs hourly backup of dbs where we store 8
 backups of the hourly onces.
 
+
+```
+crontab -e
+```
+
 ```bash
 # m h  dom mon dow   command
 00 00 * * * /home/dropbox/backup/linuxbackups backups:filesystem --backup-file-prefix="daily"
@@ -170,16 +175,18 @@ See [Tutorial on Automatic Backups to Dropbox On Linux Distributions](http://pkj
 
 ## Notifications
 
+You must configure `/opt/backup-tool/config/config.yml` so we know where to send emails / pushover.
+
 
 ```
 Use --notifications-when-done if you want to send info notifiers aswell.
 ``` 
 
-### Mail
+#### Mail
 
 Mail notifications will be more detailed, see config/config.yml.dist. If you use gmail transport, please enable IMAP on your gmail account.
 
-### Pushover
+#### Pushover
 
 Summed up notifications can be sent with pushover.
 
