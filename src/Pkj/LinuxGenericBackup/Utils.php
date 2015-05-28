@@ -68,17 +68,4 @@ class Utils {
 
         return $str;
     }
-
-    static public function giveArrayOfValuesVariables ($ar, array $keyValuePair) {
-        if (is_array($ar)) {
-            foreach ($ar as $key => $val) {
-                $ar[$key] = self::giveArrayOfValuesVariables($val, $keyValuePair);
-            }
-            return $ar;
-        } elseif (is_string($ar)){
-            return self::sprintf2($ar, $keyValuePair);
-        } else {
-            return $ar;
-        }
-    }
 } 

@@ -1,7 +1,0 @@
-{
-    "backup_path": "/home/dropbox/Dropbox/Servers/%server_name/Wordpress",
-    "amount_of_backups": 2,
-    "directories": {
-        "pkj": ["/home/www-data/vhosts/no/pkj/app/shared"]
-    }
-}

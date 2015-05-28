@@ -9,9 +9,7 @@
 namespace Pkj\LinuxGenericBackup;
 
 
-use Pkj\LinuxGenericBackup\Notifications\NotificationManager;
 use Pkj\LinuxGenericBackup\Notifications\NotificationManagerExtension;
-use Pkj\LinuxGenericBackup\Notifications\Pushover\PushoverExtension;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -33,22 +31,9 @@ class BackupHandler {
     private $output;
 
     /**
-     * @var The config file.
-     */
-    private $configFile;
-
-    /**
      * @var array|mixed Array of configuration.
      */
     public $config = array();
-
-    /**
-     * @var JsonFileExpressionParser
-     */
-    public $configSpecification;
-
-
-    public $configCmdOverride = array();
 
 
     public $container;
@@ -58,32 +43,6 @@ class BackupHandler {
     public function __construct($container) {
         $this->container = $container;
     }
-    /**
-     * Creates config specification and sets up the object.
-     * @param OutputInterface $output
-     * @param $configFile
-     */
-    public function injectInterfaces (OutputInterface $output, array $backupHandlerArguments, $configFile) {
-        $this->output = $output;
-        $this->configFile = "{$backupHandlerArguments['config-path']}$configFile";
-        $this->configSpecification = new JsonFileExpressionParser($this->configFile, array_merge($backupHandlerArguments, array(
-            'server_name' => php_uname('n')
-        )));
-
-        $this->config = $this->configSpecification->get();
-
-
-        $this->configSpecification->requireConfig('backup_path:string');
-        $this->configSpecification->requireConfig('amount_of_backups:int');
-
-        if (!$this->config['server_name']) {
-            $this->configSpecification->requireConfig('server_name:string');
-        }
-
-
-    }
-
-
 
 
 
@@ -101,26 +60,6 @@ class BackupHandler {
      */
     public function run () {
         $startTime = time();
-        // Allow cmd overrides..
-
-        $linearConfig = array();
-
-        // Work with overrides...
-
-        // Convert normal config to linear d.d.d.d.
-        Utils::arrayToLinear($this->config, $linearConfig);
-        // Check for cmd overrides....
-        foreach($this->configCmdOverride as $k => $v) {
-            $linearConfig[$k] = $v;
-        }
-        // Convert back to array.
-        $this->config = Utils::linearToArray($linearConfig, '.');
-        // Parse varibles in config..
-        $this->config = Utils::giveArrayOfValuesVariables($this->config, $linearConfig);
-        // Set backup path.
-        $this->backupFolder = $this->config['backup_path'];
-
-
 
         if (!file_exists($this->backupFolder)) {
             $this->doExec("mkdir -p {$this->backupFolder}");
@@ -139,7 +78,6 @@ class BackupHandler {
                 $createdFiles = array_merge($taskResult);
             }
         }
-
 
         $this->removeOldBackups($createdFiles);
 
@@ -204,7 +142,9 @@ class BackupHandler {
      * Executes something on server.
      * @param $e The command to execute, normally something to add a .gz. file.
      * @param bool $stopOnError
+     * @param function Callback formatter of Output.
      * @throws \Exception
+     * @return array
      */
     public function doExec ($e, $stopOnError=true, $formatter=null) {
         $output = array();
@@ -229,6 +169,7 @@ class BackupHandler {
         $this->out($message);
 
         $this->longNotificationMessage .= implode("\n", $output);
+        return $output;
     }
 
 
@@ -255,8 +196,8 @@ class BackupHandler {
             // Validation pattern, extremely important to not delete other files by mistake...
             // Generates forexample: /^.*?[\-]{1}hourly-prod-(.*?).gz/ when ./linuxbackups backups:filesystem --backup-file-prefix="hourly"
             // Generates forexample: /^.*?[\-]{1}prod-(.*?).gz/ when ./linuxbackups backups:filesystem
-            $dirregex = str_replace('/', '\/', dirname($file));
-            $pattern = "/^$dirregex\/(.*?)[\-]{1}$prefix{$config['server_name']}-(.*?).gz/";
+            $dirregex = dirname($file);
+            $pattern = "#^$dirregex/(.*?)-$prefix{$config['server_name']}-(.*?).gz#";
 
             if (preg_match($pattern, $file, $matches)) {
                 $dateFromFile = $matches[1];
@@ -322,76 +263,6 @@ class BackupHandler {
         return $prefix;
     }
 
-    public function allowCmdOverride (InputInterface $input) {
-        foreach($input->getOptions() as $k => $v) {
-            if (0 === strpos($k, self::SETTING_OVERRIDE_CMD_PREFIX)) {
-                $realkey = substr($k, strlen(self::SETTING_OVERRIDE_CMD_PREFIX));
-                if ($v) {
-                    $this->configCmdOverride[$realkey] = $v;
-                }
-            }
-        }
 
-    }
-
-    /**
-     * @return array Generic Command arguments for this handler.
-     */
-    static public function genericCommandArguments ($configFile = '') {
-        $defaultConfigPath = APP_ROOT_DIR . "/config";
-        $args = array(
-            new InputOption('env', null, InputOption::VALUE_OPTIONAL,
-                'Loads config files prefixed with this env variable, example: --env="prod" will load config/prod-database.json for the database backup.', false),
-            new InputOption('config-path', 'cp', InputOption::VALUE_REQUIRED,
-                'Where should we load config files from?', $defaultConfigPath),
-            new InputOption('backup-file-prefix', 'bfp', InputOption::VALUE_OPTIONAL,
-                'This is useful if you have different cron jobs doing forexample daily and hourly backups, set this to daily for one and hourly for another.'),
-            new InputOption('test', null, InputOption::VALUE_NONE,
-                'Test configuration, useful for testing before you actually run the scripts'),
-            new InputOption('backup-date-format', null, InputOption::VALUE_REQUIRED,
-                'Dateformat of the backup files, see valid values on php.net/date. (must be values: ' . self::DATE_FORMAT_REGEX . ')', 'Y-m-d_His'),
-            new InputOption('debug', null, InputOption::VALUE_NONE,
-                'Enables debug information.'),
-            new InputOption('notifications-when-done', null, InputOption::VALUE_NONE,
-                'Send notifications when backups is done (see config/config.yml).')
-        );
-        if ($configFile && $data = json_decode(file_get_contents($defaultConfigPath . '/' . $configFile), true)) {
-            $linearConfig = array();
-            Utils::arrayToLinear($data, $linearConfig);
-            foreach($linearConfig as $k => $v) {
-                $type = InputOption::VALUE_OPTIONAL;
-                $key = self::SETTING_OVERRIDE_CMD_PREFIX.$k;
-                $args[] = new InputOption($key, null, $type,
-                    "Override $k in settings.");
-
-            }
-        }
-
-        return $args;
-    }
-
-
-    static public function genericCommandArgumentsParse(InputInterface $input) {
-        $ar = array();
-        $ar['config-path'] = $input->getOption('config-path');
-
-        if (!file_exists($ar['config-path'])) {
-            throw new \Exception("config-path {$ar['config-path']} does not exist.");
-        }
-        $ar['test'] = $input->getOption('test');
-        $ar['backup-file-prefix'] = $input->getOption('backup-file-prefix');
-        $ar['backup-date-format'] = $input->getOption('backup-date-format');
-        $ar['debug'] = $input->getOption('debug');
-        $ar['notifications-when-done'] = $input->getOption('notifications-when-done');
-
-        if (!preg_match('/^' . self::DATE_FORMAT_REGEX . '+$/', $ar['backup-date-format'])) {
-            throw new \Exception("backup-date-format format is invalid, must be one of: " . self::DATE_FORMAT_REGEX);
-        }
-
-        $ar['config-path'] = $ar['config-path'] . '/' . ($input->getOption('env') ? $input->getOption('env') . '-' : '');
-
-
-        return $ar;
-    }
 
 } 

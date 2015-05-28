@@ -1,19 +1,51 @@
+#
+# This is a YAML configuration file.
+# See syntax and more about how to configure
+# http://en.wikipedia.org/wiki/YAML
+#
 
-# EMAIL NOTIFICATIONS:
-# To enable email notifications, uncomment below:
-#mailer:
-#    send_to: myemail@gmail.com
-#    transport: gmail
-#    gmail:
-#        username: myemail@gmail.com
-#        password: my gmail password
+backup:
+    store: "/opt/backups"
+    notify:
+        - {to: [me@myemail.com], on: [ERROR, INFO], with: local_mailer}
+    packages:
+        # /opt/backups/wordpress/default
+        # /opt/backups/wordpress/default/database ...
+        wordpress:
+            amount: 10
+            databases: { db: [mysite], with: local_mysql }
+            files:
+                - /var/www/mysite.com/wp-uploads/
 
 
-# PUSHOVER NOTIFICATIONS:
-# To enable pushover (notification to your phone, see https://pushover.net/ ).
-# and uncomment below.
-#pushover:
-#    token : ""
-#    user: ""
 
 
+connections:
+    local_mysql:
+        driver: driver.database.mysql
+        connection:
+            user: backup
+            password: backup
+            host: localhost
+
+    local_postgres:
+        driver: driver.database.postgres
+        connection:
+            user: postgres
+
+
+
+notifiers:
+    local_mailer:
+        driver: driver.notifier.mailer
+        transport: mail
+    gmail_mailer:
+        driver: driver.notifier.mailer
+        transport: gmail
+        gmail:
+            username: myemail@gmail.com
+            password: mygmailpassword
+    pushover:
+        type: driver.notifier.pushover
+        token : ""
+        user: ""

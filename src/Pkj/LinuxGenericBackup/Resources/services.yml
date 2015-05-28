@@ -1,11 +1,17 @@
 parameters:
-    notification.manager.services: []
+    manager.notification.services: []
+    manager.database.services: []
+    manager.package.packages: []
 services:
-    notification.manager:
-        class:     Pkj\LinuxGenericBackup\Notifications\NotificationManager
-        arguments: ["%notification.manager.services%"]
-
-    backup.handler:
-        class:     Pkj\LinuxGenericBackup\BackupHandler
+    manager.notification:
+        class:     Pkj\LinuxGenericBackup\Manager\NotificationManager
+        arguments: ["%manager.notification.services%"]
+    manager.database:
+        class:     Pkj\LinuxGenericBackup\Manager\DatabaseManager
+        arguments: ["%manager.database.services%"]
+    manager.package:
+        class:     Pkj\LinuxGenericBackup\Manager\PackageManager
+        arguments: ["%manager.package.packages%"]
+    manager.backup:
+        class:     Pkj\LinuxGenericBackup\Manager\NotificationManager
         arguments: ["@service_container"]
-

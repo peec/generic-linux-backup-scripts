@@ -7,7 +7,6 @@ use Symfony\Component\Console\Application;
 
 define('APP_ROOT_DIR', __DIR__);
 
-$app = new Application("Generic Linux Backup", "0.0.1");
-$app->add(new Pkj\LinuxGenericBackup\Commands\Filesystem("Filesystem backups"));
-$app->add(new Pkj\LinuxGenericBackup\Commands\Mysql("Mysql backups"));
+$app = new Application("Generic Linux Backup", "1.0.0");
+$app->add(new Pkj\LinuxGenericBackup\Commands\Backup("Create a backup"));
 $app->run();
