@@ -13,39 +13,40 @@ backup:
         # /opt/backups/wordpress/default/database ...
         wordpress:
             amount: 10
-            databases: { db: [mysite], with: local_mysql }
+            databases:
+                - { db: [mysite], with: local_mysql }
             files:
-                - /var/www/mysite.com/wp-uploads/
+                - /opt/phpstorm
+
+    databases:
+        local_mysql:
+            driver: driver.database.mysql
+            connection:
+                user: backup
+                password: backup
+                host: localhost
+
+        local_postgres:
+            driver: driver.database.postgresql
+            connection:
+                user: postgres
 
 
 
-
-connections:
-    local_mysql:
-        driver: driver.database.mysql
-        connection:
-            user: backup
-            password: backup
-            host: localhost
-
-    local_postgres:
-        driver: driver.database.postgres
-        connection:
-            user: postgres
-
-
-
-notifiers:
-    local_mailer:
-        driver: driver.notifier.mailer
-        transport: mail
-    gmail_mailer:
-        driver: driver.notifier.mailer
-        transport: gmail
-        gmail:
-            username: myemail@gmail.com
-            password: mygmailpassword
-    pushover:
-        type: driver.notifier.pushover
-        token : ""
-        user: ""
+    notifiers:
+        local_mailer:
+            driver: driver.notifier.mailer
+            config:
+                transport: mail
+        gmail_mailer:
+            driver: driver.notifier.mailer
+            config:
+                transport: gmail
+                gmail:
+                    username: myemail@gmail.com
+                    password: mygmailpassword
+        pushover:
+            driver: driver.notifier.pushover
+            config:
+                token : ""
+                user: ""
